@@ -6,6 +6,7 @@ import { LoginScreen } from '../screens/auth/LoginScreen';
 import { SignupScreen } from '../screens/auth/SignupScreen';
 import { ClassListScreen } from '../screens/app/ClassListScreen';
 import { ClassDetailScreen } from '../screens/app/ClassDetailScreen';
+import { ClassChatScreen } from '../screens/app/ClassChatScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -35,6 +36,11 @@ function AppStack() {
         name="ClassDetail"
         component={ClassDetailScreen}
         options={{ title: 'Class' }}
+      />
+      <Stack.Screen
+        name="ClassChat"
+        component={ClassChatScreen}
+        options={{ title: 'Chat' }}
       />
     </Stack.Navigator>
   );
