@@ -9,19 +9,13 @@ import {
   Platform,
 } from 'react-native';
 import { RouteProp, useRoute } from '@react-navigation/native';
-import { fetchMessages, sendMessage } from '../../lib/messages';
+import { fetchMessages, sendMessage, MessageRow } from '../../lib/messages';
 import { supabase } from '../../lib/supabaseClient';
 
 type ChatParams = {
   ClassChat: {
     classId: string;
   };
-};
-
-type MessageRow = {
-  id: string;
-  content: string;
-  created_at: string;
 };
 
 export function ClassChatScreen() {
@@ -31,6 +25,7 @@ export function ClassChatScreen() {
   const [messages, setMessages] = useState<MessageRow[]>([]);
   const [text, setText] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   async function load() {
     try {
@@ -42,28 +37,34 @@ export function ClassChatScreen() {
   }
 
   async function send() {
-    if (!text.trim()) return;
+    if (!text.trim() || !currentUserId) return;
 
-    const optimisticMessage: MessageRow = {
+    const optimistic: MessageRow = {
       id: `temp-${Date.now()}`,
       content: text.trim(),
       created_at: new Date().toISOString(),
+      user_id: currentUserId,
+      profiles: [{ email: 'You' }],
     };
 
-    setMessages((prev) => [...prev, optimisticMessage]);
+    setMessages((prev) => [...prev, optimistic]);
     setText('');
 
     try {
-      await sendMessage(classId, optimisticMessage.content);
+      await sendMessage(classId, optimistic.content);
     } catch (e: any) {
       setError(e.message);
       setMessages((prev) =>
-        prev.filter((m) => m.id !== optimisticMessage.id)
+        prev.filter((m) => m.id !== optimistic.id)
       );
     }
   }
 
   useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      setCurrentUserId(data.user?.id ?? null);
+    });
+
     load();
 
     const channel = supabase
@@ -98,11 +99,41 @@ export function ClassChatScreen() {
           contentContainerStyle={{ padding: 16, paddingBottom: 80 }}
           data={messages}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <Text style={{ marginBottom: 8 }}>
-              {item.content}
-            </Text>
-          )}
+          renderItem={({ item }) => {
+            const isMe = item.user_id === currentUserId;
+            const email = item.profiles[0]?.email ?? 'Unknown';
+
+            return (
+              <View
+                style={{
+                  alignSelf: isMe ? 'flex-end' : 'flex-start',
+                  backgroundColor: isMe ? '#007AFF' : '#E5E5EA',
+                  borderRadius: 12,
+                  padding: 10,
+                  marginBottom: 8,
+                  maxWidth: '75%',
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 12,
+                    color: isMe ? 'white' : '#555',
+                    marginBottom: 4,
+                  }}
+                >
+                  {isMe ? 'You' : email}
+                </Text>
+
+                <Text
+                  style={{
+                    color: isMe ? 'white' : 'black',
+                  }}
+                >
+                  {item.content}
+                </Text>
+              </View>
+            );
+          }}
         />
 
         {error && (

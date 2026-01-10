@@ -1,17 +1,27 @@
 import { supabase } from './supabaseClient';
 
-type MessageRow = {
+export type MessageRow = {
   id: string;
-  class_id: string;
-  user_id: string;
   content: string;
   created_at: string;
+  user_id: string;
+  profiles: {
+    email: string;
+  }[];
 };
 
 export async function fetchMessages(classId: string): Promise<MessageRow[]> {
   const { data, error } = await supabase
     .from('messages')
-    .select('*')
+    .select(`
+      id,
+      content,
+      created_at,
+      user_id,
+      profiles (
+        email
+      )
+    `)
     .eq('class_id', classId)
     .order('created_at', { ascending: true });
 
