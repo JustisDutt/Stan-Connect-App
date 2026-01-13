@@ -2,13 +2,17 @@ import { Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useAuth } from '../auth/AuthContext';
+
+// Named exports
 import { LoginScreen } from '../screens/auth/LoginScreen';
 import { SignupScreen } from '../screens/auth/SignupScreen';
 import { ClassListScreen } from '../screens/app/ClassListScreen';
-import { ClassDetailScreen } from '../screens/app/ClassDetailScreen';
-import { ClassChatScreen } from '../screens/app/ClassChatScreen';
 
-const Stack = createNativeStackNavigator();
+// Default exports
+import ClassDetailScreen from '../screens/app/ClassDetailScreen';
+import ClassChatScreen from '../screens/app/ClassChatScreen';
+
+const Stack = createNativeStackNavigator<any>();
 
 function UnverifiedScreen({ email }: { email: string }) {
   return (
@@ -32,14 +36,16 @@ function AppStack() {
   return (
     <Stack.Navigator>
       <Stack.Screen name="Classes" component={ClassListScreen} />
+
       <Stack.Screen
         name="ClassDetail"
-        component={ClassDetailScreen}
+        component={ClassDetailScreen as any}
         options={{ title: 'Class' }}
       />
+
       <Stack.Screen
         name="ClassChat"
-        component={ClassChatScreen}
+        component={ClassChatScreen as any}
         options={{ title: 'Chat' }}
       />
     </Stack.Navigator>

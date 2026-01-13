@@ -1,51 +1,117 @@
-import { View, Text, Pressable } from 'react-native';
-import { RouteProp, useRoute, useNavigation } from '@react-navigation/native';
+import { useState } from 'react';
+import { View, Text, Pressable, StyleSheet } from 'react-native';
+import ClassChatView from './ClassChatView';
+import ClassResourcesScreen from './ClassResourcesScreen';
 
-type ClassDetailParams = {
-  ClassDetail: {
-    classId: string;
-    className: string;
-    classCode: string;
+type Props = {
+  route: {
+    params: {
+      classId: string;
+      className: string;
+    };
   };
 };
 
-export function ClassDetailScreen() {
-  const route = useRoute<RouteProp<ClassDetailParams, 'ClassDetail'>>();
-  const navigation = useNavigation<any>();
+type Tab = 'chat' | 'resources';
 
-  const { classId, className, classCode } = route.params;
+export default function ClassDetailScreen({ route }: Props) {
+  const { classId, className } = route.params;
+  const [activeTab, setActiveTab] = useState<Tab>('chat');
 
   return (
-    <View style={{ padding: 20 }}>
-      <Text style={{ fontSize: 22, fontWeight: '600', marginBottom: 8 }}>
-        {className}
-      </Text>
+    <View style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.className}>{className}</Text>
+      </View>
 
-      <Text style={{ marginBottom: 20 }}>
-        Class Code: {classCode}
-      </Text>
+      {/* Tabs */}
+      <View style={styles.tabs}>
+        <Pressable
+          style={[
+            styles.tab,
+            activeTab === 'chat' && styles.activeTab,
+          ]}
+          onPress={() => setActiveTab('chat')}
+        >
+          <Text
+            style={[
+              styles.tabText,
+              activeTab === 'chat' && styles.activeTabText,
+            ]}
+          >
+            Chat
+          </Text>
+        </Pressable>
 
-      <Pressable
-        onPress={() =>
-          navigation.navigate('ClassChat', {
-            classId,
-          })
-        }
-        style={{
-          paddingVertical: 12,
-          paddingHorizontal: 16,
-          backgroundColor: '#007AFF',
-          borderRadius: 6,
-          marginBottom: 16,
-        }}
-      >
-        <Text style={{ color: 'white', fontWeight: '600' }}>
-          Open Chat
-        </Text>
-      </Pressable>
+        <Pressable
+          style={[
+            styles.tab,
+            activeTab === 'resources' && styles.activeTab,
+          ]}
+          onPress={() => setActiveTab('resources')}
+        >
+          <Text
+            style={[
+              styles.tabText,
+              activeTab === 'resources' && styles.activeTabText,
+            ]}
+          >
+            Resources
+          </Text>
+        </Pressable>
+      </View>
 
-      <Text style={{ marginBottom: 8 }}>Resources (coming soon)</Text>
-      <Text>Reminders (coming soon)</Text>
+      {/* Content */}
+      <View style={styles.content}>
+        {activeTab === 'chat' ? (
+          <ClassChatView classId={classId} />
+        ) : (
+          <ClassResourcesScreen classId={classId} />
+        )}
+      </View>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  header: {
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  className: {
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  tabs: {
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  activeTab: {
+    borderBottomWidth: 2,
+    borderBottomColor: '#000',
+  },
+  tabText: {
+    fontSize: 14,
+    color: '#666',
+  },
+  activeTabText: {
+    color: '#000',
+    fontWeight: '600',
+  },
+  content: {
+    flex: 1,
+  },
+});
