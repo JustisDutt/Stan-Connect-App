@@ -86,11 +86,25 @@ These constraints are intentional to keep the project focused on correctness, se
 
 ## Repository Structure
 
+```
 Stan-Connect-App/
 ├── mobile/
+│   ├── src/
+│   │   ├── auth/          # Authentication context and logic
+│   │   ├── lib/           # Supabase client and data helpers
+│   │   ├── navigation/    # App navigation configuration
+│   │   └── screens/       # App screens (chat, classes, auth)
+│   ├── assets/            # App icons and images
+│   ├── app.json
+│   └── package.json
 ├── supabase/
+│   ├── schema.sql
+│   ├── triggers.sql
+│   └── rls.sql
 ├── docs/
+│   └── Setup.md
 └── README.md
+```
 
 ---
 
@@ -124,10 +138,12 @@ Do not commit this file.
 
 All database definitions live in the supabase/ directory:
 
+```
 supabase/
-├── schema.sql
-├── triggers.sql
-├── rls.sql
+├── schema.sql     # Core tables and relationships
+├── triggers.sql   # Database triggers and helper functions
+└── rls.sql        # Row Level Security policies
+```
 
 These files define:
 - User profiles
