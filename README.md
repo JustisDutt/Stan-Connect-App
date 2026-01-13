@@ -88,12 +88,10 @@ These constraints are intentional to keep the project focused on correctness, se
 
 Stan-Connect-App/
 ├── mobile/
-│ └── Expo React Native application
 ├── supabase/
-│ └── Database schema, triggers, and RLS policies
 ├── docs/
-│ └── Architecture and planning documents
 └── README.md
+
 ---
 
 ## Running the Project Locally
